@@ -1,0 +1,240 @@
+# README:
+# This needs insatlling tpm (no big deal, standard procedure)
+# Run:
+#   git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+# UPD(agronskiy): this now is fulfilled by the install script.
+#
+# Then run (first time when installing plugins):
+#   prefix + I (capital i, as in Install) to fetch the plugin.
+#
+################################################################
+
+
+# Set the prefix to `ctrl + space`
+unbind C-b
+set-option -g prefix C-Space
+bind-key C-Space send-prefix
+
+# Get the colors work
+set -g default-terminal "screen-256color"
+set -ga terminal-overrides ",xterm-256color:Tc"
+
+# List of plugins
+set -g @plugin 'tmux-plugins/tpm'
+set -g @plugin 'tmux-plugins/tmux-sensible'
+
+set -g @plugin 'tmux-plugins/tmux-resurrect'
+set -g @plugin 'tmux-plugins/tmux-prefix-highlight'
+
+set -g @plugin 'tmux-plugins/tmux-continuum'
+
+set -g @plugin 'sainnhe/tmux-fzf'
+
+set -g @plugin 'christoomey/vim-tmux-navigator' # Smart vim/tmux switching panes
+
+set -g @continuum-restore 'on'
+set -g @continuum-save-interval '5'
+
+# Renew environment, creadit of github.com/samoshkin
+# We do not update SSH_AUTH_SOCK because we handle it ourselves, see aliases.pre-load.zsh
+set -g update-environment \
+  "DISPLAY\
+  SSH_ASKPASS\
+  SSH_AGENT_PID\
+  SSH_CONNECTION\
+  SSH_TTY\
+  WINDOWID\
+  XAUTHORITY"
+
+unbind R
+bind R run "$DOTFILES/tmux/renew-tmux-env.sh"
+
+# Not detach when exiting session
+set-option -g detach-on-destroy off
+
+# Automatically renumber windows
+set-option -g renumber-windows on
+
+# Set parent terminal title to reflect current window in tmux session
+set -g set-titles on
+set -g set-titles-string "#I:#W"
+
+# Don't rename windows automatically, prompt to rename window right after it's created
+set -g allow-rename off
+set -g automatic-rename off
+setw -g allow-rename off
+setw -g automatic-rename off
+
+# Start windows and panes at 1, not 0
+set -g base-index 1
+setw -g pane-base-index 1
+
+# Window navigation
+unbind n
+unbind p
+
+bind -r C-h previous-window # select previous window
+bind -r C-l next-window     # select next window
+
+# Pane navigation
+unbind o
+bind -r o select-pane -t :.+  # Just redefined o to allow cycling
+
+# Copy and mouse 
+
+bind-key -T prefix v copy-mode  # v for Vim mode 
+bind-key -T copy-mode-vi Escape send-keys -X cancel
+
+# turn on moving around with mouse
+setw -g mouse on
+bind -T copy-mode-vi y send-keys -X copy-pipe  # Only copy, no cancel
+bind -T copy-mode-vi MouseDown1Pane send-keys -X clear-selection \; select-pane  # Clear selection
+                                                                                 # on single click
+
+# To copy, drag to highlight text in yellow, press Enter and then release mouse
+# Use vim keybindings in copy mode
+setw -g mode-keys vi
+unbind -T copy-mode-vi MouseDragEnd1Pane
+
+# Pane creation
+unbind \"
+unbind \%
+bind - split-window -v -c "#{pane_current_path}" # Split horizontally
+bind \/ split-window -h -c "#{pane_current_path}" # Split vertically
+
+# Pane rotation - make it repeatable
+unbind C-o
+bind -r C-o rotate-window -D
+
+unbind \{
+unbind \}
+
+bind -r \{ swap-pane -U
+bind -r \} swap-pane -D
+
+# (credit github.com/samoshkin) Swap panes back and forth with 1st pane
+# When in main-(horizontal|vertical) layouts, the biggest/widest panel is always @1
+unbind \;
+bind -r \; if '[ #{pane_index} -eq 1 ]' \
+     'swap-pane -s "!" ; select-pane -t:.1' \
+     'select-pane -t:.1 ; swap-pane -d -t 1 -s "!"'
+
+# I usually operate pairs of windows, 1) 'some_name' 2) '[term]', and `F8` allows to
+# switch between the two.
+bind-key -T root F8 run "toggle-dev-term-window"
+
+# Deleting windows to the right to clean up the session, the script is in my `{dtofiles}/bin`
+unbind k
+bind k run "tmux-kill-windows-to-the-right"
+
+# Zoom pane
+unbind z
+bind C-f resize-pane -Z
+
+# For better visibility of the active pane
+# NOTE: https://github.com/tmux/tmux/wiki/FAQ#how-do-i-use-rgb-colour
+set -as terminal-features ",gnome*:RGB"
+set -g window-style 'bg=#282828' # closest to 236
+set -g window-active-style 'bg=colour234'
+set-window-option -g pane-border-style 'fg=colour240,bg=#282828'
+set-window-option -g pane-active-border-style 'fg=colour248,bg=colour234'
+
+# Quick switch to window using fzf:
+unbind f
+bind -r f run-shell -b "tmux list-windows -aF \"##S:##I:##W \t##{pane_current_path}\" | fzf-tmux -p 80%,80% -- -d '[: ]' --nth 1,3 | cut -d \":\" -f 1,2 | xargs -r tmux switch -t "
+
+# Incremental search (credit of https://www.seanh.cc/2020/12/27/copy-and-paste-in-tmux)
+bind -T copy-mode-vi / command-prompt -i -p "(search down)" "send -X search-forward-incremental \"%%%\""
+bind -T copy-mode-vi ? command-prompt -i -p "(search up)" "send -X search-backward-incremental \"%%%\""
+
+# Use r to quickly reload tmux settings
+unbind r
+bind r \
+	source-file ~/.tmux.conf \;\
+	display 'Reloaded tmux config'
+
+# Set the history limit so we get lots of scrollback.
+setw -g history-limit 50000000
+
+# Window/session management
+bind C-c new-session
+# Creation of ordinary window
+bind c \
+    new-window -c "#{pane_current_path}" -n '' \;\
+    command-prompt -I "#{window_name}" "rename-window '%%'"
+# Creation of a terminal window
+bind t \
+    new-window -a -c "#{pane_current_path}" -n "[term]"
+bind -r x kill-pane
+bind -r X kill-window
+bind Q confirm-before -p "kill-session #S? (y/n)" kill-session
+
+# Visual stuff
+# Status lines
+set -g status-left ' [#S]  '
+set -g status-left-style 'fg=colour25'
+# Sometimes I want a special name of the host, which is accomplished by exporting it from `~/.localrc`
+optional_host="#{?THIS_HOST_PROMPT_NAME,$THIS_HOST_PROMPT_NAME,#H}"
+is_zoomed="#{?window_zoomed_flag, #[bg=colour25#{l:,}fg=colour231] [Z] #[default] , }"
+set -g status-right "#{prefix_highlight}$is_zoomed| #[fg=colour25]$optional_host#[default]#{?TMUX_SSH_SIGN, | [SSH], | %a %Y-%m-%d %H:%M} "
+
+set -g status-left-length 25
+set -g status-right-length 100
+set -g status-style 'bg=colour248 fg=black'
+
+set -g window-status-separator ' | '
+set -g window-status-format "#I:#W#{?window_flags,#{window_flags}, }"
+set -g window-status-current-format "#I:#W#{?window_flags,#{window_flags}, }"
+set -g window-status-current-style "fg=colour231 bg=colour25"
+
+set -g @prefix_highlight_bg 'colour25'
+
+# Moving windows
+bind-key -r < swap-window -d -t -1
+bind-key -r > swap-window -d -t +1
+
+# Repeated time between keys
+set -g repeat-time 500
+
+# Tmux seems to spawn login shell every time, which makes it source ~/.profile, which
+# in turn makes python2 the default.
+# See:
+#   https://superuser.com/questions/1330824/how-to-stop-tmux-from-launching-login-shells/1330842#1330842
+#   https://stackoverflow.com/questions/57698497/conda-does-not-set-paths-when-activating-environment/57707711#57707711
+set -g default-command "${SHELL}"
+
+# Other examples:
+# set -g @plugin 'github_username/plugin_name'
+# set -g @plugin 'git@github.com/user/plugin'
+# set -g @plugin 'git@bitbucket.com/user/plugin'
+
+# Based on https://github.com/samoshkin/tmux-config/blob/master/tmux/tmux.conf
+# This allows, in case of nested local/remote tmux sessions, to switch off the prefix for the
+# local (outer) Tmux and work in the remote (inner) session as normal.
+bind-key -T root F12  \
+    set prefix None \;\
+    set key-table off \;\
+    set status-style "bg=colour238,fg=colour248" \;\
+    set status-left-style "fg=colour248" \;\
+    set status-right "#[bg=colour52] [OFF] #[default] | #[fg=colour248]$optional_host#[default]#{?SSH_CONNECTION, | [SSH], | #[fg=colour231]%a %Y-%m-%d %H:%M}#[default] " \;\
+    set window-status-current-style "fg=colour248 bg=colour241" \;\
+    refresh-client -S
+
+bind-key -T off F12  \
+    set -u prefix \;\
+    set -u key-table \;\
+    set -u status-style \;\
+    set -u status-left-style \;\
+    set -u status-right \;\
+    set -u window-status-current-style \;\
+    refresh-client -S
+
+# Better support for the gain/lose focus events in vim
+set-option -g focus-events
+
+# Allow clipboard with OSC-52 work, see https://github.com/tmux/tmux/wiki/Clipboard
+# https://github.com/ojroques/nvim-osc52?tab=readme-ov-file#configuration-for-tmux
+set -g allow-passthrough on
+
+# Initialize TMUX plugin manager (keep this line at the very bottom of tmux.conf)
+run -b '~/.tmux/plugins/tpm/tpm'
