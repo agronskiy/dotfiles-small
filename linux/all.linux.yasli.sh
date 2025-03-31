@@ -1,21 +1,19 @@
 #!/usr/bin/env bash
 
 install_tmux() {
-    [ -d /tmp/tmux-install ] && rm -rf /tmp/tmux-install
-    mkdir /tmp/tmux-install
+    [ -d "$HOME/.local/bin/tmux-install" ] && rm -rf "$HOME/.local/bin/tmux-install"
+    mkdir -p "$HOME/.local/bin/tmux-install"
     (
-        cd /tmp/tmux-install
-        $SUDO_CMD apt-get -y install libncurses5-dev libncursesw5-dev autoconf automake pkg-config libevent-dev bison byacc \
-        && git clone https://github.com/tmux/tmux.git \
-        && cd tmux \
-        && sh autogen.sh \
-        && ./configure \
-        && make \
-        && $SUDO_CMD make install
-    ) \
-    && rm -rf /tmp/tmux-install
+        cd $HOME/.local/bin/tmux-install \
+        && cp $DOTFILES/tmux/tmux.linux-amd64.tar.gz . \
+        && tar -xvf tmux.linux-amd64.tar.gz \
+        && ln -s --force "$(realpath ./tmux.linux-amd64)" "$HOME/.local/bin/tmux"
+    )
 }
-install_wrapper "tmux" install_tmux
+exists_tmux() {
+  [ -x "$(command -v tmux)" ] && tmux -V | grep -q "3.5"
+}
+install_wrapper "tmux" install_tmux exists_tmux
 
 # neovim
 install_neovim() {
