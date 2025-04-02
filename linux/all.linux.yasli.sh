@@ -29,3 +29,17 @@ exists_neovim() {
 }
 install_wrapper "neovim" install_neovim exists_neovim
 
+# rg
+install_ripgrep() {
+    [ -d "$HOME/.local/bin/ripgrep-install" ] && rm -rf "$HOME/.local/bin/ripgrep-install"
+    mkdir -p "$HOME/.local/bin/ripgrep-install"
+    cd $HOME/.local/bin/ripgrep-install \
+    && curl -LO 'https://github.com/BurntSushi/ripgrep/releases/download/13.0.0/ripgrep-13.0.0-x86_64-unknown-linux-musl.tar.gz' \
+    && tar xzvf ripgrep-13.0.0-x86_64-unknown-linux-musl.tar.gz \
+    && ln -s --force "$(realpath ./ripgrep-13.0.0-x86_64-unknown-linux-musl/rg)" "$HOME/.local/bin/rg"
+}
+exists_ripgrep() {
+    [ -x "$(command -v rg)" ]
+}
+install_wrapper "ripgrep" install_ripgrep exists_ripgrep
+
