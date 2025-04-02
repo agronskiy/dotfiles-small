@@ -11,6 +11,10 @@ LIGHT_GREEN="\[\033[1;32m\]"
  LIGHT_GRAY="\[\033[0;37m\]"
  RESET="\[\033[0m\]"
 
+# See git-prompt
+export GIT_PS1_SHOWDIRTYSTATE=1
+export GIT_PS1_SHOWUPSTREAM="auto"
+export GIT_PS1_SHOWCOLORHINTS=1
 source $DOTFILES/bash/git-prompt.inc.bash
 
 # Set a flag that we're over SSH:
