@@ -1,0 +1,39 @@
+# Shortcut to this dotfile's path is $DOTFILES.
+# your actual dotfile repo in 'work/dotfiles'?
+if [[ -d "${HOME}/.dotfiles-small" ]]; then
+  export DOTFILES="${HOME}/.dotfiles-small"
+else
+  echo "Can't locate .dotfiles-small!"
+  exit 1
+fi
+
+# Added by fzf
+# NOTE(agronskiy): run before any other sourcing because our commands (such as custom history widget) will redefine some
+# commands/bingings.
+[ -f ~/.fzf.bash ] && source ~/.fzf.bash
+
+# Loading the stuff from topic folders
+# Config files are all the files with *.rc.zsh.
+# Load the *.rc.pre.zsh files. E.g. paths go here.
+while read file ; do
+    [ -z ${file} ] && continue
+    source $file
+done <<< "$(find "$DOTFILES" -type f -name "*rc.pre.bash")"
+# Load everything but the *.pre.zsh and *.rc.post.zsh
+while read file ; do
+    [ -z ${file} ] && continue
+    source $file
+done <<< "$(find "$DOTFILES" -type f -name "*rc.bash")"
+
+# Load things that must go afterwards. E.g. various options for autocomplete go here.
+while read file ; do
+    [ -z ${file} ] && continue
+    source $file
+done <<< "$(find "$DOTFILES" -type f -name "*rc.post.bash")"
+
+# Stash local environment variables in ~/.localrc. This means they'll stay out
+# of the main dotfiles repository (which is public).
+if [[ -a ~/.localrc ]]; then
+    source ~/.localrc
+fi
+
