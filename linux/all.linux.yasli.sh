@@ -16,13 +16,16 @@ exists_tmux() {
 install_wrapper "tmux" install_tmux exists_tmux
 
 # neovim
+# this installer assumes all the lazy installations into `agnvim` appname to avoid
+# clashes with other installs
 install_neovim() {
     [ -d "$HOME/.local/bin/neovim-install" ] && rm -rf "$HOME/.local/bin/neovim-install"
     mkdir -p "$HOME/.local/bin/neovim-install"
     cd $HOME/.local/bin/neovim-install \
     && curl -LO https://github.com/neovim/neovim/releases/download/v0.10.2/nvim-linux64.tar.gz \
     && tar xzvf nvim-linux64.tar.gz \
-    && ln -s --force "$(realpath ./nvim-linux64/bin/nvim)" "$HOME/.local/bin/nvim"
+    && ln -s --force "$(realpath ./nvim-linux64/bin/nvim)" "$HOME/.local/bin/nvim" \
+    && "NVIM_APPNAME='agnvim' nvim $HOME/.local/bin/nvim $HOME/.local/bin/nvim"
 }
 exists_neovim() {
   [ -x "$(command -v nvim)" ] && nvim --version | grep -q "0.10.2"
