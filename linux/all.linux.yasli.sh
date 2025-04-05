@@ -25,7 +25,7 @@ install_neovim() {
     && curl -LO https://github.com/neovim/neovim/releases/download/v0.10.2/nvim-linux64.tar.gz \
     && tar xzvf nvim-linux64.tar.gz \
     && ln -s --force "$(realpath ./nvim-linux64/bin/nvim)" "$HOME/.local/bin/nvim" \
-    && "NVIM_APPNAME='agnvim' nvim $HOME/.local/bin/nvim $HOME/.local/bin/nvim"
+    && NVIM_APPNAME='agnvim' $HOME/.local/bin/nvim --headless '+Lazy! install' +qa
 }
 exists_neovim() {
   [ -x "$(command -v nvim)" ] && nvim --version | grep -q "0.10.2"
