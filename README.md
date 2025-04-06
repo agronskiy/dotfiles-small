@@ -19,3 +19,13 @@ Small version of https://github.com/agronskiy/dotfiles intended to:
 ```
 curl -sL https://raw.githubusercontent.com/agronskiy/dotfiles-small/main/install.sh | bash
 ```
+## Features
+
+### Tmux
+
+* `<F12>` toggles outer tmux to enabled/disabled, useful when having nested tmux
+* `osc-52` works for arbitrary chains of nested tmux/ssh/vim to copy stuff
+* pane navigation works seamlessly using `Ctrl-<hjkl>` _across_ vim and tmux panes, see Neovim section
+* `<Ctrl-Space>` as `prefix`
+* `<F8>` to, for a given window `win`, create automatically a `[term]` window to the right, and subsequently switch between the two.
+  Usecase: have pairs of dev and terminal windows to quickly switch between them
