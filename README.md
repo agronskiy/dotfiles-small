@@ -17,5 +17,5 @@ Small version of https://github.com/agronskiy/dotfiles intended to:
 ## Installation
 
 ```
-https://raw.githubusercontent.com/agronskiy/dotfiles-small/main/install.sh | bash
+curl -sL https://raw.githubusercontent.com/agronskiy/dotfiles-small/main/install.sh | bash
 ```

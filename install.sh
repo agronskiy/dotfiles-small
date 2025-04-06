@@ -31,6 +31,9 @@ else
     exit 1
 fi
 
+# Binaries will be installed into this directory
+export PATH=$HOME/.local/bin:$PATH
+
 # Run the command with DOTFILES pointing to the cloned Repo B directory
 echo -e "${YELLOW}Running yasli-main script...${NC}"
 if DOTFILES=~/.dotfiles-small ~/.yasli/yasli-main; then
