@@ -33,6 +33,9 @@ fi
 
 # Binaries will be installed into this directory
 export PATH=$HOME/.local/bin:$PATH
+export TMUX_TMPDIR=$HOME/.tmux-tmp-dir
+mkdir -p $TMUX_TMPDIR
+chmod 700 $TMUX_TMPDIR
 
 # Run the command with DOTFILES pointing to the cloned Repo B directory
 echo -e "${YELLOW}Running yasli-main script...${NC}"
