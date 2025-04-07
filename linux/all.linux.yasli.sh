@@ -18,8 +18,13 @@ install_wrapper "tmux" install_tmux exists_tmux
 # tmux-tpm
 install_tmux_tpm() {
     mkdir -p $HOME/.tmux/plugins
-    git clone https://github.com/tmux-plugins/tpm $HOME/.tmux/plugins/tpm \
-        && TMUX_PLUGIN_MANAGER_PATH=$HOME/.tmux/plugins /$HOME/.tmux/plugins/tpm/bin/install_plugins
+    git clone https://github.com/tmux-plugins/tpm $HOME/.tmux/plugins/tpm
+
+    # In some HPC environments, we actually don't want to try and run tmux already here,
+    # because this sometimes interferes with comples ssh-ing schemas from login nodes to compute nodes
+    # (and even more complex -- with runnign dockers inside those). So we let the actual installation happen when the user
+    # first actually runs tmux via <prefix> shift-I, see `tmux.conf`.
+    # && TMUX_PLUGIN_MANAGER_PATH=$HOME/.tmux/plugins /$HOME/.tmux/plugins/tpm/bin/install_plugins
 }
 exists_tmux_tpm () {
     [ -d $HOME/.tmux/plugins/tpm/.git ]
