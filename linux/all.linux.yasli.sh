@@ -1,20 +1,5 @@
 #!/usr/bin/env bash
 
-install_tmux() {
-    [ -d "$HOME/.local/bin/tmux-install" ] && rm -rf "$HOME/.local/bin/tmux-install"
-    mkdir -p "$HOME/.local/bin/tmux-install"
-    (
-        cd $HOME/.local/bin/tmux-install \
-        && cp $DOTFILES/tmux/tmux.linux-amd64.tar.gz . \
-        && tar -xvf tmux.linux-amd64.tar.gz \
-        && ln -s --force "$(realpath ./tmux.linux-amd64)" "$HOME/.local/bin/tmux"
-    )
-}
-exists_tmux() {
-  [ -x "$(command -v tmux)" ] && tmux -V | grep -q "3.5"
-}
-install_wrapper "tmux" install_tmux exists_tmux
-
 # neovim
 # this installer assumes all the lazy installations into `agnvim` appname to avoid
 # clashes with other installs

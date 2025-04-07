@@ -46,25 +46,23 @@ fi
 echo -e "${GREEN}Script execution completed successfully.${NC}"
 
 # Define the snippet to be added
-SNIPPET="if [ -f ~/.bashrc-custom ]; then
+SNIPPET_MARKER="# >>> added by .dotfiles-small installer"
+SNIPPET="$SNIPPET_MARKER
+if [ -f ~/.bashrc-custom ]; then
     . ~/.bashrc-custom
-fi"
+fi
+# <<< end"
 
 # Prompt the user
-echo "Would you like to add the following snippet to your .bashrc? (yes/no)"
+echo "Adding \n$SNIPPET\nto ~/.bashrc (if not existing)"
 echo -e "\n$SNIPPET\n"
 read -p "Your choice: " choice
 
-# Process the user's response
-if [[ "$choice" =~ ^[Yy][Ee][Ss]$ || "$choice" =~ ^[Yy]$ ]]; then
-    # Check if the snippet is already in .bashrc
-    if grep -Fxq "$SNIPPET" ~/.bashrc; then
-        echo -e "${YELLOW}The snippet is already present in your .bashrc. No changes made.${NC}"
-    else
-        # Append the snippet to .bashrc
-        echo -e "\n# Load custom bash configurations\n$SNIPPET" >> ~/.bashrc
-        echo -e "${GREEN}Snippet added successfully to your .bashrc.${NC}"
-    fi
+# Check if the snippet is already in .bashrc
+if grep -Fxq "$SNIPPET_MARKER" ~/.bashrc; then
+    echo -e "${YELLOW}The snippet is already present in your .bashrc. No changes made.${NC}"
 else
-    echo -e "${RED}No changes made to your .bashrc.${NC}"
+    # Append the snippet to .bashrc
+    echo -e "\n# Load custom bash configurations\n$SNIPPET" >> ~/.bashrc
+    echo -e "${GREEN}Snippet added successfully to your .bashrc.${NC}"
 fi
