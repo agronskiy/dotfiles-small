@@ -14,3 +14,10 @@ alias l='ls -CF'
 
 export GREP_COLORS='mt=1;35;40'
 
+# Avoid duplicates
+HISTCONTROL=ignoredups:erasedups
+HISTFILESIZE=100000
+
+# When the shell exits, append to the history file instead of overwriting it
+shopt -s histappend
+
