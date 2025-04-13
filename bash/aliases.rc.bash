@@ -1,5 +1,19 @@
 alias vim='NVIM_APPNAME="agnvim" nvim'
-export EDITOR=vim
+export EDITOR="NVIM_APPNAME="agnvim" nvim"
+
+# NOTE editing
+_edit_wo_executing() {
+    local editor="${EDITOR:-nano}"
+    tmpf="$(mktemp).sh"
+    printf '%s\n' "$READLINE_LINE" > "$tmpf"
+    $editor "$tmpf"
+    READLINE_LINE="$(<"$tmpf")"
+    READLINE_POINT="${#READLINE_LINE}"
+    rm "$tmpf"
+}
+
+bind -x '"\C-x\C-e":_edit_wo_executing'
+
 
 # Makes colors in CLI ls output
 alias ls="ls -pF --color=auto"  # ls output with "/" for folders
