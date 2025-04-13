@@ -1,12 +1,11 @@
 alias vim='NVIM_APPNAME="agnvim" nvim'
-export EDITOR="NVIM_APPNAME="agnvim" nvim"
+export EDITOR="vim"
 
-# NOTE editing
+# NOTE editing relies on using alias above expanded
 _edit_wo_executing() {
-    local editor="${EDITOR:-nano}"
     tmpf="$(mktemp).sh"
     printf '%s\n' "$READLINE_LINE" > "$tmpf"
-    $editor "$tmpf"
+    NVIM_APPNAME="agnvim" nvim "$tmpf"
     READLINE_LINE="$(<"$tmpf")"
     READLINE_POINT="${#READLINE_LINE}"
     rm "$tmpf"
