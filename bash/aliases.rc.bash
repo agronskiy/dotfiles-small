@@ -1,4 +1,5 @@
 alias vim='NVIM_APPNAME="agnvim" nvim'
+export EDITOR=vim
 
 # Makes colors in CLI ls output
 alias ls="ls -pF --color=auto"  # ls output with "/" for folders
