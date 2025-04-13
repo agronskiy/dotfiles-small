@@ -62,6 +62,16 @@ exists_fzf() {
 }
 install_wrapper "fzf" install_fzf exists_fzf
 
+# fzf tab compl
+install_fzf_tab_completion() {
+    rm -rf "$HOME/.fzf-tab-completion" || true
+    git clone --depth 1 https://github.com/agronskiy/fzf-tab-completion.git "$HOME/.fzf-tab-completion"
+}
+exists_fzf_tab_completion() {
+    [ -d $HOME/.fzf-tab-completion/.git ]
+}
+install_wrapper "fzf_tab_completion" install_fzf_tab_completion exists_fzf_tab_completion
+
 # neovim
 # this installer assumes all the lazy installations into `agnvim` appname to avoid
 # clashes with other installs
