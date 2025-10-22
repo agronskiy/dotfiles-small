@@ -4,5 +4,5 @@ alias mux="pgrep -vx tmux > /dev/null && \
 		tmux new -d -s delete-me && \
 		tmux run-shell $HOME/.tmux/plugins/tmux-resurrect/scripts/restore.sh && \
 		tmux kill-session -t delete-me && \
-		tmux attach || tmux attach"
+		tmux -u attach || tmux -u attach"
 
