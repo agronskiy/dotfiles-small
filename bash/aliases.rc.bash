@@ -11,7 +11,7 @@ _edit_wo_executing() {
     rm "$tmpf"
 }
 
-bind -x '"\C-x\C-e":_edit_wo_executing'
+bind -x '"\C-o":_edit_wo_executing'
 
 
 # Makes colors in CLI ls output
