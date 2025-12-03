@@ -30,6 +30,7 @@ esac
 
 # tmux: Uses pre-built binaries from local repo (tmux doesn't provide official binaries)
 # Note: Requires tmux.linux-${ARCH_SUFFIX}.tar.gz to exist in $DOTFILES/tmux/
+# Note: Statically linked tmux needs TERMINFO to find terminfo database
 install_tmux() {
     [ -d "$HOME/.local/bin/tmux-install" ] && rm -rf "$HOME/.local/bin/tmux-install"
     mkdir -p "$HOME/.local/bin/tmux-install"

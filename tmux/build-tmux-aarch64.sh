@@ -44,7 +44,8 @@ if [ ! -f /tmp/libs/lib/libevent.a ]; then
 fi
 
 # Build ncurses statically (single-threaded)
-echo "Building ncurses..."
+# Include terminfo database so tmux can find terminal capabilities
+echo "Building ncurses with terminfo database..."
 wget -q https://invisible-mirror.net/archives/ncurses/ncurses-6.4.tar.gz
 tar xzf ncurses-6.4.tar.gz
 cd ncurses-6.4
@@ -61,8 +62,14 @@ make -j1 V=1 2>&1 | tail -20 || {
     ./configure --host=aarch64-linux-musl --prefix=/tmp/libs --enable-static --disable-shared --without-shared
     make -j1 V=1
 }
-# Install libraries only (skip programs that need stripping)
-make install.libs install.includes || (cd ncurses && make install) && (cd include && make install)
+# Install libraries and includes only
+# Note: We skip terminfo database installation because:
+# 1. Cross-compiled tic can't run on host
+# 2. TERMINFO env var points to system terminfo locations (set in path.rc.post.bash)
+make install.libs install.includes || {
+    (cd ncurses && make install) && \
+    (cd include && make install)
+}
 cd ..
 rm -rf ncurses-6.4 ncurses-6.4.tar.gz
 
@@ -88,10 +95,11 @@ else
     }
 fi
 
-# Configure tmux with explicit include paths
+# Configure tmux with explicit include paths and terminfo database path
 CC=aarch64-linux-musl-gcc \
 CFLAGS="-static -O2 -I/tmp/libs/include -I/tmp/libs/include/ncurses" \
 LDFLAGS="-static -L/tmp/libs/lib -lncurses -levent -lssl -lcrypto" \
+TERMINFO=/tmp/libs/share/terminfo \
 ./configure --host=aarch64-linux-musl --prefix=/tmp/install
 
 # Build with verbose output and single-threaded
